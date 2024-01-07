@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chat Demo</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <style>
+      body {
+        min-height: 100vh;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: center;
+        margin: 0;
+      }
+
+      .chatbox {
+        max-width: 600px;
+        width: 100%;
+        margin: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .message {
+        background-color: #f7f8ff;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 8px;
+      }
+
+      .message p {
+        margin: 0;
+        color: #333;
+      }
+
+      .message.sent {
+        background-color: #e6f7ff;
+        text-align: right;
+      }
+
+      .message.sent p {
+        color: #007bff;
+      }
+
+      .lds-ellipsis {
+        display: inline-block;
+        position: relative;
+        height: 25px;
+        width: 70px;
+      }
+
+      .lds-ellipsis div {
+        position: absolute;
+        top: 10px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #a39c9c;
+        animation-timing-function: cubic-bezier(0, 1, 1, 0);
+      }
+
+      .lds-ellipsis div:nth-child(1) {
+        left: 8px;
+        animation: lds-ellipsis1 0.6s infinite;
+      }
+
+      .lds-ellipsis div:nth-child(2) {
+        left: 8px;
+        animation: lds-ellipsis2 0.6s infinite;
+      }
+
+      .lds-ellipsis div:nth-child(3) {
+        left: 32px;
+        animation: lds-ellipsis2 0.6s infinite;
+      }
+
+      .lds-ellipsis div:nth-child(4) {
+        left: 56px;
+        animation: lds-ellipsis3 0.6s infinite;
+      }
+
+      @keyframes lds-ellipsis1 {
+        0% {
+          transform: scale(0);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes lds-ellipsis3 {
+        0% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(0);
+        }
+      }
+
+      @keyframes lds-ellipsis2 {
+        0% {
+          transform: translate(0, 0);
+        }
+        100% {
+          transform: translate(24px, 0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chatbox">
+      <div id="messages-container"></div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const messages = [
+        { type: "text", content: "Olá, eu sou o Raul" },
+        { type: "text", content: "Desenvolvi esse chat simples exemplar." },
+        {
+          type: "text",
+          content: "Me conheça mais acessando https://www.devluar.com",
+        },
+        { type: "audio", content: "teste.ogg" },
+      ];
+
+      const messagesContainer = document.getElementById("messages-container");
+
+      function showMessage(message, index) {
+        const messageElement = document.createElement("div");
+        messageElement.className = "message";
+        messageElement.style.maxWidth = "fit-content";
+        const messageContent = document.createElement("p");
+
+        const loadingContainer = document.createElement("div");
+        loadingContainer.className = "loading-container";
+
+        const loadingElement = document.createElement("span");
+        loadingElement.className = "lds-ellipsis";
+        loadingElement.innerHTML =
+          "<div></div><div></div><div></div><div></div>";
+        loadingContainer.appendChild(loadingElement);
+
+        messageElement.appendChild(loadingContainer);
+        messageElement.appendChild(messageContent);
+
+        setTimeout(() => {
+          messageElement.removeChild(loadingContainer);
+
+          switch (message.type) {
+            case "text":
+              messageContent.innerHTML = makeLinksClickable(message.content);
+              break;
+            case "audio":
+              const audioElement = document.createElement("audio");
+              audioElement.controls = true;
+              audioElement.src = message.content;
+              messageContent.appendChild(audioElement);
+              break;
+            default:
+              messageContent.innerHTML = makeLinksClickable(
+                "Tipo de mensagem não especificada."
+              );
+              break;
+          }
+
+          if (index + 1 < messages.length) {
+            setTimeout(() => {
+              showMessage(messages[index + 1], index + 1);
+            }, 1000);
+          }
+        }, 1500);
+
+        messagesContainer.appendChild(messageElement);
+      }
+
+      showMessage(messages[0], 0);
+
+      function makeLinksClickable(text) {
+        const linkRegex = /(https?:\/\/[^\s]+)/g;
+        return text.replace(linkRegex, '<a href="$1" target="_blank">$1</a>');
+      }
+    </script>
+  </body>
+</html>
